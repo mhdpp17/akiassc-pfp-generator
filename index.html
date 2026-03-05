@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AKIASSC DP Generator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    
+    <div class="container">
+        <header>
+            <h1>AKIASSC DP Generator<span class="dot">.</span></h1>
+            <p>Create your official AKIASSC display picture.</p>
+        </header>
+
+        <main class="glass-panel">
+            <div class="workspace">
+                <div class="preview-section">
+                    <div class="canvas-container" id="canvasWrapper">
+                        <!-- Canvas will be dynamically sized in JS based on frame aspect ratio -->
+                        <canvas id="editorCanvas"></canvas>
+                        
+                        <div class="placeholder-content" id="placeholderContent">
+                            <i data-lucide="image-plus" class="upload-icon"></i>
+                            <p>Upload your photo to begin</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="controls-section">
+                    <div class="upload-group">
+                        <label class="upload-btn primary" id="photoBtn">
+                            <i data-lucide="user"></i>
+                            <span>Upload Your Photo</span>
+                            <input type="file" id="photoInput" accept="image/jpeg, image/png, image/webp" hidden>
+                        </label>
+                        <p class="helper-text">Works best with square or portrait photos</p>
+                    </div>
+
+                    <div class="slider-group" id="scaleGroup" style="display: none;">
+                        <div class="slider-header">
+                            <label for="scaleSlider">Photo Size</label>
+                            <span id="scaleValue">100%</span>
+                        </div>
+                        <input type="range" id="scaleSlider" min="10" max="300" value="100" class="premium-slider">
+                        <p class="helper-text">Drag photo directly on canvas to reposition</p>
+                    </div>
+
+                    <button class="action-btn download" id="downloadBtn" disabled>
+                        <i data-lucide="download"></i>
+                        <span>Generate & Download</span>
+                    </button>
+                    
+                    <button class="action-btn text-only" id="resetBtn" style="display: none;">
+                        <i data-lucide="rotate-ccw"></i>
+                        <span>Reset All</span>
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>
