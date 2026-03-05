@@ -30,7 +30,7 @@ body {
     align-items: center;
     position: relative;
     overflow-x: hidden;
-    padding: 2rem;
+    padding: 1rem 0.75rem;
 }
 
 /* Dynamic Background Blobs */
@@ -86,7 +86,7 @@ body {
 
 header {
     text-align: center;
-    margin-bottom: 2.5rem;
+    margin-bottom: 1.5rem;
 }
 
 h1 {
@@ -112,7 +112,7 @@ header p {
     -webkit-backdrop-filter: blur(16px);
     border: 1px solid var(--glass-border);
     border-radius: var(--border-radius);
-    padding: 2.5rem;
+    padding: 1.25rem;
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
 }
 
@@ -359,9 +359,9 @@ canvas:active {
 /* Responsive Design */
 @media (max-width: 800px) {
     body {
-        padding: 1rem;
+        padding: 0.5rem;
         align-items: flex-start;
-        /* Better scrolling on mobile */
+        min-height: 100vh;
     }
 
     /* Disable animations on mobile for better performance */
@@ -369,46 +369,101 @@ canvas:active {
         animation: none !important;
     }
 
-    .workspace {
+    .container {
+        height: 100vh;
+        display: flex;
         flex-direction: column;
-        gap: 2rem;
+    }
+
+    header {
+        margin-bottom: 0.75rem;
+        flex-shrink: 0;
     }
 
     h1 {
-        font-size: 2.2rem;
+        font-size: 1.6rem;
+        margin-bottom: 0.25rem;
+    }
+
+    header p {
+        font-size: 0.85rem;
     }
 
     .glass-panel {
-        padding: 1.5rem;
+        padding: 1rem;
         width: 100%;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow-y: auto;
+        max-height: calc(100vh - 100px);
+    }
+
+    .workspace {
+        flex-direction: column;
+        gap: 1rem;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
     }
 
     .preview-section {
         width: 100%;
+        flex-shrink: 0;
+        max-height: 45vh;
     }
 
     .canvas-container {
         max-width: 100%;
-        /* Use full width available */
+        max-height: 100%;
+        aspect-ratio: 1 / 1;
     }
 
     .controls-section {
         max-width: 100%;
         width: 100%;
-        gap: 1.5rem;
+        gap: 1rem;
+        flex-shrink: 0;
     }
 
-    .upload-btn {
-        padding: 0.8rem 1rem;
+    .upload-btn,
+    .action-btn {
+        padding: 0.7rem 1rem;
+        font-size: 0.9rem;
+    }
+
+    .slider-group {
+        padding: 0.75rem;
+    }
+
+    .helper-text {
+        font-size: 0.75rem;
+        margin-left: 0.25rem;
     }
 }
 
-@media (max-width: 400px) {
+@media (max-width: 500px) {
     h1 {
-        font-size: 1.8rem;
+        font-size: 1.4rem;
+        margin-bottom: 0.2rem;
     }
 
     header p {
-        font-size: 0.95rem;
+        font-size: 0.8rem;
+    }
+
+    .upload-btn,
+    .action-btn {
+        padding: 0.6rem 0.9rem;
+        font-size: 0.85rem;
+    }
+
+    .premium-slider {
+        height: 5px;
+    }
+
+    .premium-slider::-webkit-slider-thumb {
+        width: 18px;
+        height: 18px;
     }
 }

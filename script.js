@@ -77,8 +77,16 @@ document.addEventListener('DOMContentLoaded', () => {
             
             render();
         };
+        
+        img.onerror = () => {
+            console.error('Failed to load frame.png');
+            loader.style.display = 'none';
+            uploadIcon.style.display = 'inline-block';
+            placeholderText.innerText = 'Frame not found. Upload a photo to begin.';
+        };
+        
         img.loading = 'lazy';
-        img.src = 'frame.png'; // Load from same directory
+        img.src = '/frame.png'; // Load from root
     }
     
     // Initialize frame loading on startup
