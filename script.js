@@ -34,6 +34,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // Render Optimization State
     let isRendering = false;
     let renderRequested = false;
+    let lastRenderTime = 0;
+    const RENDER_THROTTLE = 16; // ~60fps on mobile
+    let startDragX = 0;
+    let startDragY = 0;
+    
+    // Detect mobile for performance optimization
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
     // --- 1. Load Frame Automatically ---
     function loadFrame() {
@@ -43,6 +50,9 @@ document.addEventListener('DOMContentLoaded', () => {
         placeholderText.innerText = 'Loading official frame...';
         
         const img = new Image();
+        // Optimize image loading for mobile
+        img.decoding = 'async';
+        
         img.onload = () => {
             frameImage = img;
             
@@ -67,6 +77,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             render();
         };
+        img.loading = 'lazy';
         img.src = 'frame.png'; // Load from same directory
     }
     
@@ -88,6 +99,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const reader = new FileReader();
         reader.onload = (event) => {
             const img = new Image();
+            img.decoding = 'async';
+            
             img.onload = () => {
                 userPhoto = img;
                 
@@ -136,9 +149,9 @@ document.addEventListener('DOMContentLoaded', () => {
         // Clear canvas
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         
-        // Setup smoothing
+        // Setup smoothing - optimize for mobile
         ctx.imageSmoothingEnabled = true;
-        ctx.imageSmoothingQuality = 'high';
+        ctx.imageSmoothingQuality = isMobile ? 'medium' : 'high';
 
         // 3a. Draw User Photo (Behind)
         if (userPhoto) {
@@ -161,11 +174,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     function queueRender() {
-        if (!isRendering) {
-            renderRequested = false;
-            requestAnimationFrame(render);
-        } else {
-            renderRequested = true;
+        // Throttle renders during drag to prevent excessive reflows
+        const now = performance.now();
+        if (now - lastRenderTime >= RENDER_THROTTLE) {
+            lastRenderTime = now;
+            if (!isRendering) {
+                renderRequested = false;
+                requestAnimationFrame(render);
+            } else {
+                renderRequested = true;
+            }
         }
     }
 
@@ -242,8 +260,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const doDrag = (e) => {
         if (!isDragging || !userPhoto) return;
         
-        // Prevent generic scrolling during drag across all devices
-        e.preventDefault();
+        // Only prevent default for touch events
+        if (e.touches || e.changedTouches) {
+            e.preventDefault();
+        }
         
         const pos = getEventPos(e);
         
@@ -278,14 +298,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Mouse Events
     canvas.addEventListener('mousedown', startDrag);
-    window.addEventListener('mousemove', doDrag, { passive: false });
-    window.addEventListener('mouseup', endDrag);
+    window.addEventListener('mousemove', doDrag, { passive: true });
+    window.addEventListener('mouseup', endDrag, { passive: true });
 
-    // Touch Events
+    // Touch Events - non-passive for preventDefault in doDrag
     canvas.addEventListener('touchstart', startDrag, { passive: false });
     window.addEventListener('touchmove', doDrag, { passive: false });
-    window.addEventListener('touchend', endDrag);
-    window.addEventListener('touchcancel', endDrag);
+    window.addEventListener('touchend', endDrag, { passive: true });
+    window.addEventListener('touchcancel', endDrag, { passive: true });
 
     // --- 5. Download & Reset ---
     downloadBtn.addEventListener('click', () => {

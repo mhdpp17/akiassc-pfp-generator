@@ -144,6 +144,9 @@ header p {
     justify-content: center;
     align-items: center;
     transition: var(--transition);
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
 }
 
 .canvas-container.has-frame {
@@ -158,6 +161,8 @@ canvas {
     cursor: grab;
     display: block;
     position: absolute;
+    touch-action: none;
+    will-change: transform;
 }
 
 canvas:active {
@@ -357,6 +362,11 @@ canvas:active {
         padding: 1rem;
         align-items: flex-start;
         /* Better scrolling on mobile */
+    }
+
+    /* Disable animations on mobile for better performance */
+    .blob {
+        animation: none !important;
     }
 
     .workspace {
