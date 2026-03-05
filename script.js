@@ -14,6 +14,11 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const downloadBtn = document.getElementById('downloadBtn');
     const resetBtn = document.getElementById('resetBtn');
+    
+    // Loader Elements
+    const loader = document.getElementById('loader');
+    const uploadIcon = document.getElementById('uploadIcon');
+    const placeholderText = document.getElementById('placeholderText');
 
     // State
     let frameImage = null;
@@ -35,6 +40,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- 1. Load Frame Automatically ---
     function loadFrame() {
+        // Show loader
+        loader.style.display = 'inline-block';
+        uploadIcon.style.display = 'none';
+        placeholderText.innerText = 'Loading official frame...';
+        
         const img = new Image();
         img.onload = () => {
             frameImage = img;
@@ -51,8 +61,12 @@ document.addEventListener('DOMContentLoaded', () => {
             canvasContainer.style.aspectRatio = `${virtualWidth} / ${virtualHeight}`;
             canvasContainer.classList.add('has-frame');
             
-            // Hide placeholder text "Upload your photo to begin"
-            // We want it to show so user knows to upload, but we'll fade it if needed later when photo uploads
+            // Hide loader text "Upload your photo to begin", show regular prompt if no photo yet
+            if (!userPhoto) {
+                loader.style.display = 'none';
+                uploadIcon.style.display = 'inline-block';
+                placeholderText.innerText = 'Upload your photo to begin';
+            }
             
             render();
         };
@@ -66,6 +80,13 @@ document.addEventListener('DOMContentLoaded', () => {
     photoInput.addEventListener('change', (e) => {
         const file = e.target.files[0];
         if (!file) return;
+
+        // Show loading state for photo parsing
+        placeholderContent.style.display = 'flex';
+        placeholderContent.style.opacity = '1';
+        loader.style.display = 'inline-block';
+        uploadIcon.style.display = 'none';
+        placeholderText.innerText = 'Processing your photo...';
 
         const reader = new FileReader();
         reader.onload = (event) => {
@@ -258,7 +279,12 @@ document.addEventListener('DOMContentLoaded', () => {
         // Redraw frame only
         render();
         
-        placeholderContent.style.display = 'block';
+        // Show default placeholder prompt again
+        loader.style.display = 'none';
+        uploadIcon.style.display = 'inline-block';
+        placeholderText.innerText = 'Upload your photo to begin';
+        
+        placeholderContent.style.display = 'flex';
         setTimeout(() => placeholderContent.style.opacity = '1', 10);
         
         photoInput.value = '';

@@ -26,8 +26,9 @@
                         <canvas id="editorCanvas"></canvas>
                         
                         <div class="placeholder-content" id="placeholderContent">
-                            <i data-lucide="image-plus" class="upload-icon"></i>
-                            <p>Upload your photo to begin</p>
+                            <div class="loader" id="loader" style="display: none;"></div>
+                            <i data-lucide="image-plus" class="upload-icon" id="uploadIcon"></i>
+                            <p id="placeholderText">Loading original frame...</p>
                         </div>
                     </div>
                 </div>
