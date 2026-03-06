@@ -41,6 +41,7 @@ body {
     z-index: -1;
     opacity: 0.6;
     animation: float 20s infinite alternate linear;
+    pointer-events: none;
 }
 
 .blob-1 {
@@ -114,6 +115,7 @@ header p {
     border-radius: var(--border-radius);
     padding: 1.25rem;
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    will-change: auto;
 }
 
 .workspace {
@@ -143,7 +145,7 @@ header p {
     display: flex;
     justify-content: center;
     align-items: center;
-    transition: var(--transition);
+    transition: border 0.3s ease;
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     user-select: none;
@@ -244,7 +246,7 @@ canvas:active {
     font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
-    transition: var(--transition);
+    transition: background-color 0.2s, transform 0.2s;
     border: none;
     width: 100%;
     text-decoration: none;
@@ -364,9 +366,9 @@ canvas:active {
         min-height: 100vh;
     }
 
-    /* Disable animations on mobile for better performance */
+    /* Hide blobs completely on mobile to save performance */
     .blob {
-        animation: none !important;
+        display: none !important;
     }
 
     .container {
@@ -395,8 +397,13 @@ canvas:active {
         flex: 1;
         display: flex;
         flex-direction: column;
-        overflow-y: auto;
+        background: rgba(30, 41, 59, 0.7);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
         max-height: calc(100vh - 100px);
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
     }
 
     .workspace {
@@ -417,6 +424,12 @@ canvas:active {
         max-width: 100%;
         max-height: 100%;
         aspect-ratio: 1 / 1;
+        box-shadow: none;
+    }
+
+    .canvas-container.has-frame {
+        border: none;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     }
 
     .controls-section {
@@ -430,10 +443,13 @@ canvas:active {
     .action-btn {
         padding: 0.7rem 1rem;
         font-size: 0.9rem;
+        transition: background-color 0.15s;
     }
 
     .slider-group {
         padding: 0.75rem;
+        background: rgba(0, 0, 0, 0.15);
+        box-shadow: none;
     }
 
     .helper-text {

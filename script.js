@@ -24,6 +24,9 @@ document.addEventListener('DOMContentLoaded', () => {
     let frameImage = null;
     let userPhoto = null;
     
+    // Detect mobile for performance optimization
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    
     // Photo transformations
     let photoOriginX = 0;
     let photoOriginY = 0;
@@ -35,12 +38,11 @@ document.addEventListener('DOMContentLoaded', () => {
     let isRendering = false;
     let renderRequested = false;
     let lastRenderTime = 0;
-    const RENDER_THROTTLE = 16; // ~60fps on mobile
+    const RENDER_THROTTLE = isMobile ? 33 : 16; // 30fps on mobile, 60fps on desktop
     let startDragX = 0;
     let startDragY = 0;
-    
-    // Detect mobile for performance optimization
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    let cachedCanvasRect = null;
+    let rectCacheTime = 0;
 
     // --- 1. Load Frame Automatically ---
     function loadFrame() {
@@ -50,10 +52,10 @@ document.addEventListener('DOMContentLoaded', () => {
         placeholderText.innerText = 'Loading official frame...';
         
         const img = new Image();
-        // Optimize image loading for mobile
-        img.decoding = 'async';
+        img.crossOrigin = 'anonymous';
         
         img.onload = () => {
+            console.log('Frame loaded successfully:', img.width, 'x', img.height);
             frameImage = img;
             
             // Set virtual resolution to match the frame exactly
@@ -78,15 +80,14 @@ document.addEventListener('DOMContentLoaded', () => {
             render();
         };
         
-        img.onerror = () => {
-            console.error('Failed to load frame.png');
+        img.onerror = (e) => {
+            console.error('Failed to load frame.png:', e);
             loader.style.display = 'none';
             uploadIcon.style.display = 'inline-block';
             placeholderText.innerText = 'Frame not found. Upload a photo to begin.';
         };
         
-        img.loading = 'lazy';
-        img.src = '/frame.png'; // Load from root
+        img.src = '/frame.png';
     }
     
     // Initialize frame loading on startup
@@ -159,7 +160,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Setup smoothing - optimize for mobile
         ctx.imageSmoothingEnabled = true;
-        ctx.imageSmoothingQuality = isMobile ? 'medium' : 'high';
+        ctx.imageSmoothingQuality = isMobile ? 'low' : 'high';
 
         // 3a. Draw User Photo (Behind)
         if (userPhoto) {
@@ -228,8 +229,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Mouse/Touch Dragging
     function getEventPos(e) {
-        // Find canvas bounds
-        const rect = canvas.getBoundingClientRect();
+        // Use cached bounds if recent (cache for 100ms to reduce recalculation)
+        const now = performance.now();
+        if (!cachedCanvasRect || (now - rectCacheTime) > 100) {
+            cachedCanvasRect = canvas.getBoundingClientRect();
+            rectCacheTime = now;
+        }
+        
+        const rect = cachedCanvasRect;
         let clientX, clientY;
 
         // Handle touch events vs mouse events
@@ -281,7 +288,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // The canvas is scaled via CSS. We need to translate those screen pixels 
         // back to our high-res virtual canvas coordinates.
-        const rect = canvas.getBoundingClientRect();
+        const rect = cachedCanvasRect;
         const scaleX = virtualWidth / rect.width;
         const scaleY = virtualHeight / rect.height;
         
